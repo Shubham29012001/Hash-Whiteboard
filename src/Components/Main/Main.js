@@ -24,6 +24,7 @@ import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import AllScroll from "../AllScroll/AllScroll";
 import ShareIcon from "@mui/icons-material/IosShare";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
+import Tooltip from "@mui/material/Tooltip";
 
 import io from "socket.io-client";
 import Notification from "../Notification/Notification";
@@ -370,20 +371,26 @@ class Main extends React.Component {
           className="whiteboard__header"
           style={{ backgroundColor: "#363d48" }}
         >
-          <ShareIcon
-            className={`header--item ${
-              this.state.socketConnected ? "shareIcon--active" : ""
-            }`}
-            onClick={this.makeThisLive}
-          />
-          <CancelPresentationIcon
-            className={`header--item ${
-              this.state.socketConnected
-                ? "stopIcon--active"
-                : "stopIcon--disabled"
-            }`}
-            onClick={this.makeThisOffline}
-          />
+          <Tooltip title="Share" placement="right">
+            <ShareIcon
+              className={`header--item ${
+                this.state.socketConnected ? "shareIcon--active" : ""
+              }`}
+              onClick={this.makeThisLive}
+            />
+          </Tooltip>
+
+          <Tooltip title="Cancel Presentation" placement="right">
+            <CancelPresentationIcon
+              className={`header--item ${
+                this.state.socketConnected
+                  ? "stopIcon--active"
+                  : "stopIcon--disabled"
+              }`}
+              onClick={this.makeThisOffline}
+            />
+          </Tooltip>
+
           {!this.state.receiverConnected && (
             <>
               <span
@@ -391,48 +398,64 @@ class Main extends React.Component {
                   this.state.active === "Pencil" && "item--active"
                 }`}
               >
-                <BrushIcon onClick={this.pencilClick} />
+                <Tooltip title="Brush" placement="right">
+                  <BrushIcon onClick={this.pencilClick} />
+                </Tooltip>
                 {/* { this.state.showPencilOptions && <span></span>} */}
               </span>
-              <span className="eraser__container">
-                <EraserIcon
-                  icon="mdi:eraser"
-                  onClick={this.toggleEraserSlider}
-                  className={`header--item`}
+              <Tooltip title="Eraser" placement="top">
+                <span className="eraser__container">
+                  <EraserIcon
+                    icon="mdi:eraser"
+                    onClick={this.toggleEraserSlider}
+                    className={`header--item`}
+                  />
+                  {this.state.showEraserSlider && (
+                    <span className="eraser__slider">
+                      <input
+                        type="range"
+                        min="1"
+                        max="100"
+                        value={this.state.eraserWidth}
+                        onChange={this.eraserClick}
+                      />
+                    </span>
+                  )}
+                </span>
+              </Tooltip>
+
+              <Tooltip title="Rectangle Shape" placement="right">
+                <RectangleIcon
+                  className={`header--item ${
+                    this.state.active === "Rectangle" && "item--active"
+                  }`}
+                  onClick={() => {
+                    this.setState({
+                      tool: Tools.Rectangle,
+                      active: "Rectangle",
+                    });
+                  }}
                 />
-                {this.state.showEraserSlider && (
-                  <span className="eraser__slider">
-                    <input
-                      type="range"
-                      min="1"
-                      max="100"
-                      value={this.state.eraserWidth}
-                      onChange={this.eraserClick}
-                    />
-                  </span>
-                )}
-              </span>
-              <RectangleIcon
-                className={`header--item ${
-                  this.state.active === "Rectangle" && "item--active"
-                }`}
-                onClick={() => {
-                  this.setState({ tool: Tools.Rectangle, active: "Rectangle" });
-                }}
-              />
-              <CircleIcon
-                className={`header--item ${
-                  this.state.active === "Circle" && "item--active"
-                }`}
-                onClick={() => {
-                  this.setState({ tool: Tools.Circle, active: "Circle" });
-                }}
-              />
+              </Tooltip>
+
+              <Tooltip title="Circle Icon" placement="right">
+                <CircleIcon
+                  className={`header--item ${
+                    this.state.active === "Circle" && "item--active"
+                  }`}
+                  onClick={() => {
+                    this.setState({ tool: Tools.Circle, active: "Circle" });
+                  }}
+                />
+              </Tooltip>
+
               <span className="color__picker">
-                <PaletteIcon
-                  onClick={this.toggleColorPicker}
-                  className="header--item"
-                />
+                <Tooltip title="Color Picker" placement="right">
+                  <PaletteIcon
+                    onClick={this.toggleColorPicker}
+                    className="header--item"
+                  />
+                </Tooltip>
                 {this.state.showColorPicker && (
                   <HexColorPicker
                     className="color__palette"
@@ -441,21 +464,42 @@ class Main extends React.Component {
                   />
                 )}
               </span>
-              <ClearIcon className="header--item" onClick={this.clearBoard} />
-              <UndoIcon
-                onClick={this.undoStep}
-                key={"a"}
-                className="undo header--item"
-              />
-              <RedoIcon onClick={this.redoStep} className="redo header--item" />
+
+              <Tooltip title="Clear" placement="right">
+                <ClearIcon className="header--item" onClick={this.clearBoard} />
+              </Tooltip>
+
+              <Tooltip title="Undo" placement="right">
+                <UndoIcon
+                  onClick={this.undoStep}
+                  key={"a"}
+                  className="undo header--item"
+                />
+              </Tooltip>
+
+              <Tooltip title="Redo" placement="right">
+                <RedoIcon
+                  onClick={this.redoStep}
+                  className="redo header--item"
+                />
+              </Tooltip>
             </>
           )}
-          <ZoomInIcon className={`header--item`} onClick={this.zoomIn} />
-          <ZoomOutIcon className={`header--item`} onClick={this.zoomOut} />
-          <FileDownloadIcon
-            className={`header--item`}
-            onClick={() => exportComponentAsPNG(this.sketchField)}
-          />
+
+          <Tooltip title="Zoom-In" placement="right">
+            <ZoomInIcon className={`header--item`} onClick={this.zoomIn} />
+          </Tooltip>
+
+          <Tooltip title="Zoom-Out" placement="right">
+            <ZoomOutIcon className={`header--item`} onClick={this.zoomOut} />
+          </Tooltip>
+
+          <Tooltip title="Download Sketch" placement="right">
+            <FileDownloadIcon
+              className={`header--item`}
+              onClick={() => exportComponentAsPNG(this.sketchField)}
+            />
+          </Tooltip>
         </div>
         {whiteboard}
         {this.state.shortUrl && (
